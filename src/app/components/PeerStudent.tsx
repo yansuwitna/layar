@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import ZoomableVideoWrapper from './ZoomableVideoWrapper';
 
 export default function PeerStudent({ token, teacherIp }: { token: string, teacherIp?: string }) {
   const [stream, setStream] = useState<MediaStream | null>(null);
@@ -104,28 +105,30 @@ export default function PeerStudent({ token, teacherIp }: { token: string, teach
   }, [token]);
 
   return (
-    <div className="video-container" style={{ background: '#000', height: '100%', position: 'relative' }}>
-      {!stream && (
-        <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', color: 'white', textAlign: 'center', zIndex: 10 }}>
-          {status}
-        </div>
-      )}
-      {stream && teacherIp && (
-        <div style={{ position: 'absolute', top: '10px', right: '10px', background: 'rgba(0,0,0,0.5)', color: 'white', padding: '0.25rem 0.5rem', borderRadius: '4px', fontSize: '0.8rem', zIndex: 10 }}>
-          IP Guru: {teacherIp}
-        </div>
-      )}
-      <video 
-        ref={videoRef} 
-        autoPlay 
-        playsInline 
-        controls
-        onClick={(e) => {
-          e.currentTarget.play().catch(() => {});
-          setStatus('');
-        }}
-        style={{ width: '100%', height: '100%', objectFit: 'contain', display: stream ? 'block' : 'none', cursor: 'pointer' }} 
-      />
-    </div>
+    <ZoomableVideoWrapper>
+      <div className="video-container" style={{ background: '#000', height: '100%', width: '100%', position: 'relative' }}>
+        {!stream && (
+          <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', color: 'white', textAlign: 'center', zIndex: 10 }}>
+            {status}
+          </div>
+        )}
+        {stream && teacherIp && (
+          <div style={{ position: 'absolute', top: '10px', right: '10px', background: 'rgba(0,0,0,0.5)', color: 'white', padding: '0.25rem 0.5rem', borderRadius: '4px', fontSize: '0.8rem', zIndex: 10 }}>
+            IP Guru: {teacherIp}
+          </div>
+        )}
+        <video 
+          ref={videoRef} 
+          autoPlay 
+          playsInline 
+          muted
+          onClick={(e) => {
+            e.currentTarget.play().catch(() => {});
+            setStatus('');
+          }}
+          style={{ width: '100%', height: '100%', objectFit: 'contain', display: stream ? 'block' : 'none', pointerEvents: 'none' }} 
+        />
+      </div>
+    </ZoomableVideoWrapper>
   );
 }

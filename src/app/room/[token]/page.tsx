@@ -14,6 +14,7 @@ import { Track } from 'livekit-client';
 import '@livekit/components-styles';
 import Swal from 'sweetalert2';
 import PeerStudent from '@/app/components/PeerStudent';
+import ZoomableVideoWrapper from '@/app/components/ZoomableVideoWrapper';
 
 import { getLocalIP } from '@/lib/getIp';
 
@@ -128,19 +129,21 @@ export default function RoomPage({ params }: { params: { token: string } }) {
             Menghubungkan ke Kelas...
           </div>
         ) : (
-          <LiveKitRoom
-            video={false} 
-            audio={false} 
-            token={liveKitToken}
-            serverUrl={serverUrl}
-            data-lk-theme="default"
-            style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
-          >
-            <div style={{ flex: 1, overflow: 'hidden' }}>
-              <RemoteTracksView />
-            </div>
-            <RoomAudioRenderer />
-          </LiveKitRoom>
+          <ZoomableVideoWrapper>
+            <LiveKitRoom
+              video={false} 
+              audio={false} 
+              token={liveKitToken}
+              serverUrl={serverUrl}
+              data-lk-theme="default"
+              style={{ height: '100%', width: '100%', display: 'flex', flexDirection: 'column' }}
+            >
+              <div style={{ flex: 1, overflow: 'hidden' }}>
+                <RemoteTracksView />
+              </div>
+              <RoomAudioRenderer />
+            </LiveKitRoom>
+          </ZoomableVideoWrapper>
         )}
       </div>
     </main>
