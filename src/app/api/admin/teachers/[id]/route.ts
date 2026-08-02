@@ -24,12 +24,14 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
 // Delete Teacher
 export async function DELETE(req: Request, { params }: { params: { id: string } }) {
   try {
+    console.log("Deleting teacher with ID:", params.id);
     await prisma.teacher.delete({
       where: { id: params.id },
     });
 
     return NextResponse.json({ success: true, message: 'Teacher deleted successfully' });
-  } catch (error) {
-    return NextResponse.json({ error: 'Failed to delete teacher' }, { status: 500 });
+  } catch (error: any) {
+    console.error('Error deleting teacher:', error);
+    return NextResponse.json({ error: 'Failed to delete teacher: ' + (error.message || String(error)) }, { status: 500 });
   }
 }
