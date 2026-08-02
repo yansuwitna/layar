@@ -82,6 +82,55 @@ export default function PeerTeacher({ token, teacherIp }: { token: string, teach
     }
   };
 
+  const startCameraShare = async () => {
+    try {
+      setError('');
+      setIsStarting(true);
+      
+      const mediaStream = await navigator.mediaDevices.getUserMedia({ 
+        video: { facingMode: 'environment' }, // Try to use back camera by default
+        audio: true 
+      });
+      setStream(mediaStream);
+      
+      if (videoRef.current) {
+        videoRef.current.srcObject = mediaStream;
+      }
+
+      const { default: Peer } = await import('peerjs');
+      const peer = new Peer(`layar-room-${token}`);
+      peerRef.current = peer;
+
+      peer.on('open', (id: string) => {
+        setPeerId(id);
+      });
+
+      peer.on('call', (call: any) => {
+        call.answer(mediaStream);
+        setConnections((prev) => prev + 1);
+        call.on('close', () => {
+          setConnections((prev) => prev - 1);
+        });
+        call.on('error', (err: any) => {
+           console.error('Call error', err);
+        });
+      });
+
+      peer.on('error', (err: any) => {
+         console.error('Peer error', err);
+         if (err.type === 'unavailable-id') {
+             setError('Sesi kelas ini sudah aktif di tempat lain.');
+             stopScreenShare();
+         }
+      });
+    } catch (err: any) {
+      console.error('Error sharing camera:', err);
+      setError('Gagal mengakses kamera: ' + err.message);
+    } finally {
+      setIsStarting(false);
+    }
+  };
+
   const stopScreenShare = () => {
     if (stream) {
       stream.getTracks().forEach(track => track.stop());
@@ -103,23 +152,33 @@ export default function PeerTeacher({ token, teacherIp }: { token: string, teach
 
   return (
     <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', background: 'rgba(255,255,255,0.05)' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', background: 'rgba(255,255,255,0.05)', flexWrap: 'wrap', gap: '1rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
           <span style={{ color: 'white', fontWeight: 'bold' }}>Status: {stream ? 'Sedang Berbagi (Lokal)' : 'Menunggu'}</span>
           {localIp && <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.9rem' }}>| IP Anda: {localIp}</span>}
           {stream && <span style={{ color: '#48bb78', fontWeight: 'bold', fontSize: '0.9rem' }}>• {connections} Siswa</span>}
         </div>
         
-        <div>
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
           {!stream ? (
-            <button 
-              className="btn btn-primary" 
-              onClick={startScreenShare} 
-              disabled={isStarting}
-              style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem' }}
-            >
-              <MonitorUp size={16} /> {isStarting ? 'Memulai...' : 'Mulai Bagikan Layar'}
-            </button>
+            <>
+              <button 
+                className="btn btn-primary" 
+                onClick={startScreenShare} 
+                disabled={isStarting}
+                style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem' }}
+              >
+                <MonitorUp size={16} /> {isStarting ? 'Memulai...' : 'Layar (PC)'}
+              </button>
+              <button 
+                className="btn btn-outline" 
+                onClick={startCameraShare} 
+                disabled={isStarting}
+                style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', background: '#2b6cb0', color: 'white', border: 'none' }}
+              >
+                Kamera (HP)
+              </button>
+            </>
           ) : (
             <button 
               className="btn" 
@@ -138,7 +197,7 @@ export default function PeerTeacher({ token, teacherIp }: { token: string, teach
         {!stream && !isStarting && (
           <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', color: 'rgba(255,255,255,0.5)', textAlign: 'center' }}>
             <MonitorUp size={48} style={{ margin: '0 auto 1rem auto', opacity: 0.5, display: 'block' }} />
-            <p>Klik tombol <strong>"Mulai Bagikan Layar"</strong> di atas untuk memulai sesi kelas.</p>
+            <p>Pilih mode berbagi di atas. <strong>Layar (PC)</strong> untuk membagikan tampilan komputer, atau <strong>Kamera (HP)</strong> untuk menyorot pakai kamera.</p>
           </div>
         )}
         <video 

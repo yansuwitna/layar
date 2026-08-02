@@ -15,21 +15,24 @@ import '@livekit/components-styles';
 import Swal from 'sweetalert2';
 import PeerTeacher from '@/app/components/PeerTeacher';
 
-function ScreenShareView() {
-  const tracks = useTracks([Track.Source.ScreenShare]);
+function PreviewTracksView() {
+  const screenTracks = useTracks([Track.Source.ScreenShare]);
+  const cameraTracks = useTracks([Track.Source.Camera]);
+  
+  const tracks = [...screenTracks, ...cameraTracks];
   
   if (tracks.length === 0) {
     return (
-      <div style={{ display: 'flex', height: '100%', justifyContent: 'center', alignItems: 'center', color: '#666', fontSize: '1.2rem' }}>
-        Tidak ada layar yang dibagikan. Klik ikon komputer/layar di bawah untuk mulai membagikan layar.
+      <div style={{ display: 'flex', height: '100%', justifyContent: 'center', alignItems: 'center', color: '#666', fontSize: '1.2rem', textAlign: 'center', padding: '1rem' }}>
+        Tidak ada aktivitas. Klik ikon Layar atau Kamera di bawah untuk mulai mengajar.
       </div>
     );
   }
 
   return (
-    <div style={{ height: '100%', width: '100%', position: 'relative' }}>
+    <div style={{ height: '100%', width: '100%', position: 'relative', display: 'flex', flexWrap: 'wrap' }}>
       {tracks.map((track, idx) => (
-         <VideoTrack key={track.publication?.trackSid || track.participant?.identity || idx} trackRef={track} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+         <VideoTrack key={track.publication?.trackSid || track.participant?.identity || idx} trackRef={track} style={{ flex: 1, width: '100%', height: '100%', objectFit: 'contain' }} />
       ))}
     </div>
   );
@@ -137,7 +140,7 @@ export default function TeacherDashboard() {
               <PeerTeacher token={teacher.token} teacherIp={serverUrl} />
             ) : token && serverUrl ? (
               <LiveKitRoom
-                video={false} // Disable camera
+                video={true} // Allow camera for HP fallback
                 audio={false} // Microphone enabled manually via ControlBar
                 token={token}
                 serverUrl={serverUrl}
@@ -145,9 +148,9 @@ export default function TeacherDashboard() {
                 style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
               >
                 <div style={{ flex: 1, overflow: 'hidden' }}>
-                  <ScreenShareView />
+                  <PreviewTracksView />
                 </div>
-                <ControlBar controls={{ microphone: true, screenShare: true, camera: false, chat: false }} />
+                <ControlBar controls={{ microphone: true, screenShare: true, camera: true, chat: false }} />
                 <RoomAudioRenderer />
               </LiveKitRoom>
             ) : (
