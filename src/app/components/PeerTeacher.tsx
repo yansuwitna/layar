@@ -32,7 +32,17 @@ export default function PeerTeacher({ token, teacherIp }: { token: string, teach
         throw new Error('Fitur berbagi layar tidak didukung di perangkat atau browser ini. Pastikan Anda menggunakan PC/Laptop dan mengakses melalui HTTPS.');
       }
       
-      const mediaStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
+      let mediaStream;
+      try {
+        // Coba dengan audio (Chrome/Edge mendukung ini)
+        mediaStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
+      } catch (audioErr: any) {
+        // Safari (Mac/iPad) akan error jika kita meminta audio di layar.
+        // Fallback: Minta video (layar) saja tanpa audio.
+        console.warn('Share screen with audio failed, falling back to video only.', audioErr);
+        mediaStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+      }
+      
       setStream(mediaStream);
       
       if (videoRef.current) {
