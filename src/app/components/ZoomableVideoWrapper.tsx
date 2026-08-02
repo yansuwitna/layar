@@ -20,6 +20,22 @@ export default function ZoomableVideoWrapper({ children }: { children: ReactNode
     return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
   }, []);
 
+  // Prevent swipe down from exiting fullscreen on mobile browsers
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    
+    const handleNativeTouchMove = (e: TouchEvent) => {
+      // Prevent default browser pinch-to-zoom or swipe when scale is 1
+      if (e.touches.length > 1 || scale === 1) {
+        e.preventDefault();
+      }
+    };
+    
+    el.addEventListener('touchmove', handleNativeTouchMove, { passive: false });
+    return () => el.removeEventListener('touchmove', handleNativeTouchMove);
+  }, [scale]);
+
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
       if (containerRef.current?.requestFullscreen) {
