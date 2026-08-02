@@ -87,32 +87,40 @@ export default function ZoomableVideoWrapper({ children }: { children: ReactNode
   return (
     <div 
       ref={containerRef} 
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
       style={{ 
         position: 'relative', 
         width: '100%', 
         height: '100%', 
         backgroundColor: '#000',
-        overflow: scale > 1 ? 'auto' : 'hidden',
-        display: 'flex',
-        alignItems: scale > 1 ? 'flex-start' : 'center',
-        justifyContent: scale > 1 ? 'flex-start' : 'center'
+        overflow: 'hidden'
       }}
     >
       <div 
-        style={{ 
-          width: scale > 1 ? `${scale * 100}%` : '100%', 
-          height: scale > 1 ? `${scale * 100}%` : '100%', 
-          transition: 'width 0.2s, height 0.2s',
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        style={{
+          width: '100%',
+          height: '100%',
+          overflow: scale > 1 ? 'auto' : 'hidden',
           display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexShrink: 0
+          alignItems: scale > 1 ? 'flex-start' : 'center',
+          justifyContent: scale > 1 ? 'flex-start' : 'center'
         }}
       >
-        {children}
+        <div 
+          style={{ 
+            width: scale > 1 ? `${scale * 100}%` : '100%', 
+            height: scale > 1 ? `${scale * 100}%` : '100%', 
+            transition: 'width 0.2s, height 0.2s',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0
+          }}
+        >
+          {children}
+        </div>
       </div>
 
       <div style={{
