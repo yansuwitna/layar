@@ -76,8 +76,8 @@ npm run build
 Setelah *build* selesai, jalankan aplikasi menggunakan PM2.
 
 ```bash
-# Jalankan aplikasi dengan nama "layar-app" di port 3000
-pm2 start npm --name "layar-app" -- start
+# Jalankan aplikasi dengan nama "layar" di port 3400 menggunakan variabel PORT
+PORT=3400 pm2 start npm --name "layar" -- start
 
 # Simpan konfigurasi PM2 agar otomatis jalan saat server reboot
 pm2 save
@@ -88,11 +88,11 @@ pm2 startup
 Untuk melihat status aplikasi:
 ```bash
 pm2 status
-pm2 logs layar-app
+pm2 logs layar
 ```
 
 ### Langkah 7: Setup Nginx (Reverse Proxy) - Opsional
-Sangat disarankan menggunakan Nginx untuk mengarahkan Port 80 (HTTP) ke aplikasi Next.js Anda (Port 3000).
+Sangat disarankan menggunakan Nginx untuk mengarahkan Port 80 (HTTP) ke aplikasi Next.js Anda (Port 3400).
 
 ```bash
 sudo apt install nginx -y
@@ -110,7 +110,7 @@ server {
     server_name domain-anda.com; # Ganti dengan domain/IP Anda
 
     location / {
-        proxy_pass http://localhost:3000;
+        proxy_pass http://localhost:3400;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
@@ -141,5 +141,5 @@ sudo systemctl restart nginx
   npx prisma generate
   npx prisma db push
   npm run build
-  pm2 restart layar-app
+  pm2 restart layar
   ```

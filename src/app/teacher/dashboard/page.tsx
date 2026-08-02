@@ -28,8 +28,8 @@ function ScreenShareView() {
 
   return (
     <div style={{ height: '100%', width: '100%', position: 'relative' }}>
-      {tracks.map((track) => (
-         <VideoTrack key={track.trackSid} trackRef={track} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+      {tracks.map((track, idx) => (
+         <VideoTrack key={track.publication?.trackSid || track.participant?.identity || idx} trackRef={track} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
       ))}
     </div>
   );
