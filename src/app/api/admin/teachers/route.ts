@@ -7,6 +7,7 @@ export async function GET() {
       select: {
         id: true,
         username: true,
+        name: true,
         token: true,
         createdAt: true,
       },
