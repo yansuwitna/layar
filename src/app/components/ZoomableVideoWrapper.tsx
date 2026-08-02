@@ -44,9 +44,52 @@ export default function ZoomableVideoWrapper({ children }: { children: ReactNode
   const handleZoomOut = () => setScale(s => Math.max(s - 0.5, 1));
   const handleResetZoom = () => setScale(1);
 
+  const [initialPinchDistance, setInitialPinchDistance] = useState<number | null>(null);
+  const [initialScale, setInitialScale] = useState(1);
+
+  const getPinchDistance = (e: React.TouchEvent) => {
+    if (e.touches.length >= 2) {
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      return Math.sqrt(dx * dx + dy * dy);
+    }
+    return null;
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length === 2) {
+      const dist = getPinchDistance(e);
+      if (dist !== null) {
+        setInitialPinchDistance(dist);
+        setInitialScale(scale);
+      }
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (e.touches.length === 2 && initialPinchDistance !== null) {
+      const dist = getPinchDistance(e);
+      if (dist !== null) {
+        const pinchRatio = dist / initialPinchDistance;
+        let newScale = initialScale * pinchRatio;
+        newScale = Math.min(Math.max(newScale, 1), 5);
+        setScale(newScale);
+      }
+    }
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (e.touches.length < 2) {
+      setInitialPinchDistance(null);
+    }
+  };
+
   return (
     <div 
       ref={containerRef} 
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
       style={{ 
         position: 'relative', 
         width: '100%', 
