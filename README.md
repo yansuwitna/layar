@@ -151,5 +151,5 @@ npm run build
 pm2 restart layar
 
 # Gabungan
-git pull && pm2 stop all && rm -rf .next && npm run build && pm2 start all
+git pull && pm2 stop layar && rm -rf .next && npm run build && pm2 start layar
 ```
