@@ -92,7 +92,8 @@ export default function ZoomableVideoWrapper({ children }: { children: ReactNode
         width: '100%', 
         height: '100%', 
         backgroundColor: '#000',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        overscrollBehavior: 'none'
       }}
     >
       <div 
@@ -105,7 +106,9 @@ export default function ZoomableVideoWrapper({ children }: { children: ReactNode
           overflow: scale > 1 ? 'auto' : 'hidden',
           display: 'flex',
           alignItems: scale > 1 ? 'flex-start' : 'center',
-          justifyContent: scale > 1 ? 'flex-start' : 'center'
+          justifyContent: scale > 1 ? 'flex-start' : 'center',
+          overscrollBehavior: 'none',
+          touchAction: scale > 1 ? 'pan-x pan-y' : 'none'
         }}
       >
         <div 
