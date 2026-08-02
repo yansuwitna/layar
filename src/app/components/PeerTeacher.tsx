@@ -27,6 +27,11 @@ export default function PeerTeacher({ token, teacherIp }: { token: string, teach
     try {
       setError('');
       setIsStarting(true);
+      
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
+        throw new Error('Fitur berbagi layar tidak didukung di perangkat atau browser ini. Pastikan Anda menggunakan PC/Laptop dan mengakses melalui HTTPS.');
+      }
+      
       const mediaStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
       setStream(mediaStream);
       

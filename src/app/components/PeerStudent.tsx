@@ -65,6 +65,11 @@ export default function PeerStudent({ token, teacherIp }: { token: string, teach
           setStatus('');
           if (videoRef.current) {
             videoRef.current.srcObject = remoteStream;
+            // Handle autoplay block for streams with audio (e.g. Tab Share)
+            videoRef.current.play().catch(e => {
+              console.warn('Autoplay prevented:', e);
+              setStatus('Layar siap. Silakan klik tombol Play atau layar ini untuk memulai.');
+            });
           }
         });
 
@@ -115,7 +120,11 @@ export default function PeerStudent({ token, teacherIp }: { token: string, teach
         autoPlay 
         playsInline 
         controls
-        style={{ width: '100%', height: '100%', objectFit: 'contain', display: stream ? 'block' : 'none' }} 
+        onClick={(e) => {
+          e.currentTarget.play().catch(() => {});
+          setStatus('');
+        }}
+        style={{ width: '100%', height: '100%', objectFit: 'contain', display: stream ? 'block' : 'none', cursor: 'pointer' }} 
       />
     </div>
   );
