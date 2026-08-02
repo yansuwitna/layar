@@ -18,7 +18,7 @@ export async function POST(req: Request) {
     // Refresh token on login if empty (should not be empty but just in case)
     let token = teacher.token;
     if (!token) {
-      token = uuidv4().substring(0, 8);
+      token = uuidv4().substring(0, 8).toUpperCase();
       await prisma.teacher.update({ where: { id: teacher.id }, data: { token } });
     }
 

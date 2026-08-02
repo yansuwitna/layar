@@ -15,7 +15,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Username already exists' }, { status: 400 });
     }
 
-    const token = uuidv4().substring(0, 8); // Simple 8 character token
+    const token = uuidv4().substring(0, 8).toUpperCase(); // Simple 8 character token
     const teacher = await prisma.teacher.create({
       data: {
         username,

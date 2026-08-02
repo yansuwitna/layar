@@ -41,7 +41,7 @@ export default function StudentJoin() {
               type="text" 
               className="form-control" 
               value={token} 
-              onChange={(e) => setToken(e.target.value)}
+              onChange={(e) => setToken(e.target.value.toUpperCase())}
               required
             />
           </div>
